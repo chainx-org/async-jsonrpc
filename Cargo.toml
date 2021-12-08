@@ -10,7 +10,7 @@ repository = "https://github.com/koushiro/async-jsonrpc-client-rs"
 keywords = ["async", "jsonrpc", "client"]
 
 [features]
-default = ["http", "ws"]
+default = ["http"]
 http = ["reqwest"]
 ws = ["async-tungstenite", "parking_lot", "tokio"]
 
@@ -23,7 +23,7 @@ serde_json = "1.0"
 thiserror = "1.0"
 
 # HTTP
-reqwest = { version = "0.10", features = ["json"], optional = true }
+reqwest = { version = "0.11", features = ["json"], optional = true }
 
 # WebSocket
 async-tungstenite = { version = "0.7", features = ["tokio-runtime"], optional = true }

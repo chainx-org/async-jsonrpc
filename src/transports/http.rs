@@ -12,6 +12,8 @@ pub struct HttpTransport {
     id: Arc<AtomicUsize>,
     url: String,
     bearer_auth_token: Option<String>,
+    basic_auth_username: Option<String>,
+    basic_auth_password: Option<String>,
     client: reqwest::Client,
 }
 
@@ -30,6 +32,8 @@ impl HttpTransport {
             id: Default::default(),
             url: url.into(),
             bearer_auth_token: None,
+            basic_auth_username: None,
+            basic_auth_password: None,
             client: Self::new_client(),
         }
     }
@@ -40,6 +44,24 @@ impl HttpTransport {
             id: Default::default(),
             url: url.into(),
             bearer_auth_token: Some(token.into()),
+            basic_auth_username: None,
+            basic_auth_password: None,
+            client: Self::new_client(),
+        }
+    }
+
+    /// Create a new HTTP transport with given `url` and basic auth
+    pub fn new_with_basic_auth<U: Into<String>, T: Into<String>>(
+        url: U,
+        username: T,
+        password: T,
+    ) -> Self {
+        Self {
+            id: Default::default(),
+            url: url.into(),
+            bearer_auth_token: None,
+            basic_auth_username: Some(username.into()),
+            basic_auth_password: Some(password.into()),
             client: Self::new_client(),
         }
     }
@@ -51,6 +73,13 @@ impl HttpTransport {
         } else {
             builder
         };
+
+        let builder = if let Some(username) = &self.basic_auth_username {
+            builder.basic_auth(username, self.basic_auth_password.clone())
+        } else {
+            builder
+        };
+
         Ok(builder.send().await?.json().await?)
     }
 }
